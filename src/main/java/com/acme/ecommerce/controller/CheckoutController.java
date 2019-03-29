@@ -78,7 +78,7 @@ public class CheckoutController {
 			redirectAttributes.addFlashAttribute("couponCode", couponCode);
 			return "redirect:/checkout/coupon";
 		}
-
+		
     	sCart.setCouponCode(couponCode);
    	
 		return "redirect:shipping";
