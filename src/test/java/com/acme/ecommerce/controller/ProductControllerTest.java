@@ -2,6 +2,7 @@ package com.acme.ecommerce.controller;
 
 import com.acme.ecommerce.Application;
 import com.acme.ecommerce.domain.Product;
+import com.acme.ecommerce.domain.ShoppingCart;
 import com.acme.ecommerce.service.ProductService;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,6 +46,7 @@ public class ProductControllerTest {
 
 	@Mock
 	private ProductService productService;
+
 	@InjectMocks
 	private ProductController productController;
 

@@ -288,6 +288,19 @@ public class CartControllerTest {
 	}
 
 	@Test
+	public void subTotalFoundTest() throws Exception {
+		Product product = productBuilder();
+		when(productService.findById(1L)).thenReturn(product);
+		Purchase purchase = purchaseBuilder(product);
+		when(sCart.getPurchase()).thenReturn(purchase);
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/cart"))
+						.andDo(print())
+						.andExpect(model().attributeExists("subTotal"));
+
+	}
+
+	@Test
 	public void emptyInvalidCartTest() throws Exception {
 
 		when(sCart.getPurchase()).thenReturn(null);
