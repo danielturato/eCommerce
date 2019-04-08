@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="utf-8"/>
         <meta http-equiv="x-ua-compatible" content="ie=edge"/>
@@ -18,6 +18,7 @@
                 <ul>
                     <li><a href="/product/about">About</a></li>
                     <li><a href="#">FAQ</a></li>
+					<li th:text="${'$' + #numbers.formatDecimal(subTotal, 1, 2, 'POINT')}" th:if="${notEmpty}"></li>
                     <li><a class="button icon-right" href="/cart">View Cart <i class="material-icons">shopping_cart</i></a></li>
                 </ul>
             </nav>

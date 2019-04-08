@@ -71,14 +71,16 @@ public class CheckoutController {
 	}
 
 	@RequestMapping(path="/coupon", method = RequestMethod.POST)
-	String postCouponCode(Model model, @ModelAttribute(value="couponCode")@Valid CouponCode couponCode, BindingResult result, RedirectAttributes redirectAttributes) {
+	String postCouponCode(Model model, @ModelAttribute(value="couponCode")@Valid CouponCode couponCode, BindingResult result,
+						  RedirectAttributes redirectAttributes) {
 
 		if (result.hasErrors()) {
+			logger.error("Errors on fields: " + result.getFieldErrorCount());
 			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.couponCode", result);
 			redirectAttributes.addFlashAttribute("couponCode", couponCode);
 			return "redirect:/checkout/coupon";
 		}
-		
+
     	sCart.setCouponCode(couponCode);
    	
 		return "redirect:shipping";
@@ -244,7 +246,8 @@ public class CheckoutController {
     		model.addAttribute("orderNumber", purchase.getOrderNumber());
     		model.addAttribute("shippingAddress", purchase.getShippingAddress());
     		model.addAttribute("billingAddress", purchase.getBillingAddress());
-    		model.addAttribute("creditCard", purchase.getCreditCardNumber());
+    		model.addAttribute("creditCard", purchase.getCreditCardNumber()
+																	.substring(purchase.getCreditCardNumber().length()-4));
     	} else {
     		logger.error("No purchases Found!");
     		return("redirect:/error");
@@ -277,9 +280,8 @@ public class CheckoutController {
 	    		
 	    		ctx.setVariable("orderNumber", purchase.getOrderNumber());
 	    		ctx.setVariable("shippingAddress", purchase.getShippingAddress());
-	    		ctx.setVariable("billingAddress", purchase.getBillingAddress());
-	    		ctx.setVariable("creditCard", purchase.getCreditCardNumber());
-	    		
+
+
 	    		final String htmlContent = this.templateEngine.process("email_confirmation", ctx);
 			
 		    	response.setHeader("Content-Disposition", "attachment; filename=email_receipt.html");

@@ -101,6 +101,19 @@ public class CartControllerTest {
 	}
 
 	@Test
+	public void addToCartMoreThanStockTest() throws Exception {
+		Product product = productBuilder();
+
+		when(productService.findById(1L)).thenReturn(product);
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/cart/add").param("quantity", "10").param("productId", "1"))
+				.andDo(print())
+				.andExpect(status().is3xxRedirection());
+
+		// TODO: And expect flash error
+	}
+
+	@Test
 	public void addUnknownToCartTest() throws Exception {
 		when(productService.findById(1L)).thenReturn(null);
 
@@ -124,6 +137,25 @@ public class CartControllerTest {
 				.andDo(print())
 				.andExpect(status().is3xxRedirection())
 				.andExpect(redirectedUrl("/cart"));
+	}
+
+	@Test
+	public void updateCartWithTooMuchStockTest() throws Exception {
+		Product product = productBuilder();
+
+		when(productService.findById(1L)).thenReturn(product);
+
+		Purchase purchase = purchaseBuilder(product);
+
+		when(sCart.getPurchase()).thenReturn(purchase);
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/cart/update").param("newQuantity", "10").param("productId", "1"))
+				.andDo(print())
+				.andExpect(status().is3xxRedirection())
+				.andExpect(redirectedUrl("/cart"));
+
+		// TODO: Expect error flash message..
+
 	}
 
 	@Test

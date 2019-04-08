@@ -2,11 +2,14 @@ package com.acme.ecommerce.controller;
 
 import com.acme.ecommerce.domain.Product;
 import com.acme.ecommerce.domain.ProductPurchase;
+import com.acme.ecommerce.domain.Purchase;
+import com.acme.ecommerce.domain.ShoppingCart;
 import com.acme.ecommerce.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,9 +24,11 @@ import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.math.BigDecimal;
 
 @Controller
 @RequestMapping("/product")
+@Scope("request")
 public class ProductController {
 	
 	final Logger logger = LoggerFactory.getLogger(ProductController.class);
@@ -33,7 +38,10 @@ public class ProductController {
 	
 	@Autowired
 	ProductService productService;
-	
+
+	@Autowired
+	ShoppingCart sCart;
+
 	@Autowired
 	HttpSession session;
 	
@@ -51,7 +59,11 @@ public class ProductController {
 		int evalPage = (page == null || page < 1) ? INITIAL_PAGE : page - 1;
     	
     	Page<Product> products = productService.findAll(new PageRequest(evalPage, PAGE_SIZE));
-    	
+
+		if (sCart.getPurchase() != null) {
+			model.addAttribute("subTotal",  computeSubtotal(sCart.getPurchase()));
+		}
+
 		model.addAttribute("products", products);
 
         return "index";
@@ -105,4 +117,16 @@ public class ProductController {
     	logger.warn("Happy Easter! Someone actually clicked on About.");
     	return("about");
     }
+
+	private BigDecimal computeSubtotal(Purchase purchase) {
+
+		BigDecimal subTotal = new BigDecimal(0);
+
+		for (ProductPurchase pp : purchase.getProductPurchases()) {
+			logger.debug("cart has " + pp.getQuantity() + " of " + pp.getProduct().getName() + " at " + "$" + pp.getProduct().getPrice());
+			subTotal = subTotal.add(pp.getProduct().getPrice().multiply(new BigDecimal(pp.getQuantity())));
+		}
+
+		return subTotal;
+	}
 }
