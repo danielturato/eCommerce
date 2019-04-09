@@ -116,7 +116,7 @@ public class ProductController {
 	public String productNotFound(Model model) {
     	model.addAttribute("error", "Product not found!");
     	logger.debug("Product with that ID has not been found");
-    	return "error";
+    	return "errorExc";
 	}
 
 	private BigDecimal computeSubtotal(Purchase purchase) {

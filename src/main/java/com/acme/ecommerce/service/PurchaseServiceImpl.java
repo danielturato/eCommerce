@@ -31,6 +31,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
 	@Override
 	public Purchase save(Purchase purchase) {
+
 		Purchase result = repository.save(purchase);
 		
 		return result;

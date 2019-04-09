@@ -2,6 +2,7 @@ package com.acme.ecommerce.service;
 
 import com.acme.ecommerce.domain.Product;
 import com.acme.ecommerce.domain.ProductNotFoundException;
+import com.acme.ecommerce.domain.StockFullException;
 import com.acme.ecommerce.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -39,6 +40,13 @@ public class ProductServiceImpl implements ProductService {
 		}
 
 		return result;
+	}
+
+	@Override
+	public void checkStock(Product product, int quantity) {
+		if (quantity > product.getQuantity()) {
+			throw new StockFullException();
+		}
 	}
 
 }
