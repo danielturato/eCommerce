@@ -1,9 +1,6 @@
 package com.acme.ecommerce.controller;
 
-import com.acme.ecommerce.domain.Product;
-import com.acme.ecommerce.domain.ProductPurchase;
-import com.acme.ecommerce.domain.Purchase;
-import com.acme.ecommerce.domain.ShoppingCart;
+import com.acme.ecommerce.domain.*;
 import com.acme.ecommerce.service.ProductService;
 import com.acme.ecommerce.service.PurchaseService;
 import org.slf4j.Logger;
@@ -15,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpSession;
@@ -64,7 +62,7 @@ public class CartController {
 	}
 
 	@RequestMapping(path = "/add", method = RequestMethod.POST)
-	public RedirectView addToCart(@ModelAttribute(value = "productId") long productId, @ModelAttribute(value = "quantity") int quantity) {
+	public RedirectView addToCart(@ModelAttribute(value = "productId") long productId, @ModelAttribute(value = "quantity") int quantity, RedirectAttributes redirectAttributes) {
 		boolean productAlreadyInCart = false;
 		boolean stockError = false;
 		RedirectView redirect = new RedirectView("/product/");
@@ -106,6 +104,7 @@ public class CartController {
 			if (!stockError) {
 				logger.debug("Added " + quantity + " of " + addProduct.getName() + " to cart");
 				sCart.setPurchase(purchaseService.save(purchase));
+				redirectAttributes.addFlashAttribute("flash", new FlashMessage("Product added to the cart!", FlashMessage.Status.SUCCESS));
 			}
 
 		} else {
@@ -117,7 +116,7 @@ public class CartController {
 	}
 
 	@RequestMapping(path = "/update", method = RequestMethod.POST)
-	public RedirectView updateCart(@ModelAttribute(value = "productId") long productId, @ModelAttribute(value = "newQuantity") int newQuantity) {
+	public RedirectView updateCart(@ModelAttribute(value = "productId") long productId, @ModelAttribute(value = "newQuantity") int newQuantity, RedirectAttributes redirectAttributes) {
 		logger.debug("Updating Product: " + productId + " with Quantity: " + newQuantity);
 		RedirectView redirect = new RedirectView("/cart");
 		redirect.setExposeModelAttributes(false);
@@ -136,8 +135,10 @@ public class CartController {
 								if (newQuantity <= pp.getProduct().getQuantity()) {
 									pp.setQuantity(newQuantity);
 									logger.debug("Updated " + updateProduct.getName() + " to " + newQuantity);
+									redirectAttributes.addFlashAttribute("flash", new FlashMessage("Product quantity has been updated!", FlashMessage.Status.SUCCESS));
 								} else {
 									logger.debug("The new quantity excedes the stock level for " + pp.getProduct().getName());
+									redirectAttributes.addFlashAttribute("flash", new FlashMessage("The new quantity excedes the current stock level!", FlashMessage.Status.FAILURE));
 								}
 							} else {
 								purchase.getProductPurchases().remove(pp);
@@ -158,7 +159,7 @@ public class CartController {
 	}
 
 	@RequestMapping(path = "/remove", method = RequestMethod.POST)
-	public RedirectView removeFromCart(@ModelAttribute(value = "productId") long productId) {
+	public RedirectView removeFromCart(@ModelAttribute(value = "productId") long productId, RedirectAttributes redirectAttributes) {
 		logger.debug("Removing Product: " + productId);
 		RedirectView redirect = new RedirectView("/cart");
 		redirect.setExposeModelAttributes(false);
@@ -172,6 +173,7 @@ public class CartController {
 						if (pp.getProduct().getId().equals(productId)) {
 							purchase.getProductPurchases().remove(pp);
 							logger.debug("Removed " + updateProduct.getName());
+							redirectAttributes.addFlashAttribute("flash", new FlashMessage("Product removed from the cart", FlashMessage.Status.SUCCESS));
 							break;
 						}
 					}
@@ -195,7 +197,7 @@ public class CartController {
 	}
 
 	@RequestMapping(path = "/empty", method = RequestMethod.POST)
-	public RedirectView emptyCart() {
+	public RedirectView emptyCart(RedirectAttributes redirectAttributes) {
 		RedirectView redirect = new RedirectView("/product/");
 		redirect.setExposeModelAttributes(false);
 
@@ -204,6 +206,7 @@ public class CartController {
 		if (purchase != null) {
 			purchase.getProductPurchases().clear();
 			sCart.setPurchase(purchaseService.save(purchase));
+			redirectAttributes.addFlashAttribute("flash", new FlashMessage("Your cart is now empty!", FlashMessage.Status.SUCCESS));
 		} else {
 			logger.error("Unable to find shopping cart for update");
 			redirect.setUrl("/error");

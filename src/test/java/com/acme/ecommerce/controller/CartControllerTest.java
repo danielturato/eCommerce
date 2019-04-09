@@ -97,7 +97,8 @@ public class CartControllerTest {
 		mockMvc.perform(MockMvcRequestBuilders.post("/cart/add").param("quantity", "1").param("productId", "1"))
 				.andDo(print())
 				.andExpect(status().is3xxRedirection())
-				.andExpect(redirectedUrl("/product/"));
+				.andExpect(redirectedUrl("/product/"))
+				.andExpect(flash().attributeExists("flash"));
 	}
 
 	@Test
@@ -108,9 +109,9 @@ public class CartControllerTest {
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/cart/add").param("quantity", "10").param("productId", "1"))
 				.andDo(print())
-				.andExpect(status().is3xxRedirection());
+				.andExpect(status().is3xxRedirection())
+				.andExpect(flash().attributeExists("flash"));;
 
-		// TODO: And expect flash error
 	}
 
 	@Test
@@ -136,7 +137,8 @@ public class CartControllerTest {
 		mockMvc.perform(MockMvcRequestBuilders.post("/cart/update").param("newQuantity", "2").param("productId", "1"))
 				.andDo(print())
 				.andExpect(status().is3xxRedirection())
-				.andExpect(redirectedUrl("/cart"));
+				.andExpect(redirectedUrl("/cart"))
+				.andExpect(flash().attributeExists("flash"));
 	}
 
 	@Test
@@ -152,9 +154,8 @@ public class CartControllerTest {
 		mockMvc.perform(MockMvcRequestBuilders.post("/cart/update").param("newQuantity", "10").param("productId", "1"))
 				.andDo(print())
 				.andExpect(status().is3xxRedirection())
-				.andExpect(redirectedUrl("/cart"));
-
-		// TODO: Expect error flash message..
+				.andExpect(redirectedUrl("/cart"))
+				.andExpect(flash().attributeExists("flash"));
 
 	}
 
@@ -212,7 +213,8 @@ public class CartControllerTest {
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/cart/remove").param("productId", "1")).andDo(print())
 				.andExpect(status().is3xxRedirection())
-				.andExpect(redirectedUrl("/cart"));
+				.andExpect(redirectedUrl("/cart"))
+				.andExpect(flash().attributeExists("flash"));
 	}
 
 	@Test
@@ -248,7 +250,8 @@ public class CartControllerTest {
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/cart/remove").param("productId", "1")).andDo(print())
 				.andExpect(status().is3xxRedirection())
-				.andExpect(redirectedUrl("/product/"));
+				.andExpect(redirectedUrl("/product/"))
+				.andExpect(flash().attributeExists("flash"));
 	}
 
 	@Test
@@ -284,7 +287,8 @@ public class CartControllerTest {
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/cart/empty")).andDo(print())
 				.andExpect(status().is3xxRedirection())
-				.andExpect(redirectedUrl("/product/"));
+				.andExpect(redirectedUrl("/product/"))
+				.andExpect(flash().attributeExists("flash"));
 	}
 
 	@Test

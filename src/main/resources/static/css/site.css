@@ -701,6 +701,27 @@ form div .error-message {
 	}
 }
 
+/* FLASH MESSAGES */
+
+.flash {
+	margin-top: 0;
+	margin-bottom: 0;
+	padding: 1rem 2rem;
+	border-radius: 0;
+	font-size: 1.1rem;
+}
+
+.flash.success {
+	background-color: #7f9e40;
+	color: #f3f6ee;
+}
+
+.flash.failure {
+	background-color: #ac4343;
+	color: #f2e2e2;
+}
+
+
 
 
 

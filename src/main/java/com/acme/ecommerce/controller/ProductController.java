@@ -1,9 +1,6 @@
 package com.acme.ecommerce.controller;
 
-import com.acme.ecommerce.domain.Product;
-import com.acme.ecommerce.domain.ProductPurchase;
-import com.acme.ecommerce.domain.Purchase;
-import com.acme.ecommerce.domain.ShoppingCart;
+import com.acme.ecommerce.domain.*;
 import com.acme.ecommerce.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,11 +10,13 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpSession;
@@ -70,20 +69,15 @@ public class ProductController {
     }
     
     @RequestMapping(path = "/detail/{id}", method = RequestMethod.GET)
-    public String productDetail(@PathVariable long id, Model model) {
+    public String productDetail(@PathVariable long id, Model model, RedirectAttributes redirectAttributes) {
     	logger.debug("Details for Product " + id);
     	
     	Product returnProduct = productService.findById(id);
-    	if (returnProduct != null) {
-    		model.addAttribute("product", returnProduct);
-    		ProductPurchase productPurchase = new ProductPurchase();
-    		productPurchase.setProduct(returnProduct);
-    		productPurchase.setQuantity(1);
-    		model.addAttribute("productPurchase", productPurchase);
-    	} else {
-    		logger.error("Product " + id + " Not Found!");
-    		return "redirect:/error";
-    	}
+		model.addAttribute("product", returnProduct);
+		ProductPurchase productPurchase = new ProductPurchase();
+		productPurchase.setProduct(returnProduct);
+		productPurchase.setQuantity(1);
+		model.addAttribute("productPurchase", productPurchase);
 
         return "product_detail";
     }
@@ -117,6 +111,13 @@ public class ProductController {
     	logger.warn("Happy Easter! Someone actually clicked on About.");
     	return("about");
     }
+
+	@ExceptionHandler(ProductNotFoundException.class)
+	public String productNotFound(Model model) {
+    	model.addAttribute("error", "Product not found!");
+    	logger.debug("Product with that ID has not been found");
+    	return "error";
+	}
 
 	private BigDecimal computeSubtotal(Purchase purchase) {
 

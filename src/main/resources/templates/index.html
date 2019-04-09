@@ -23,6 +23,9 @@
                 </ul>
             </nav>
         </header>
+        <div th:if="${flash}">
+            <div th:classappend="${#strings.toLowerCase(flash.status)}" th:text="${flash.message}" class="flash"></div>
+        </div>
         <section class="product-listing">  
         	<div th:each="product,iterStat : ${products}" class="item">
                 <a th:href="@{/product/detail/{productId}(productId=${product.id})}"><img th:src="@{/product/{productId}/image(productId=${product.id})}"/></a>
